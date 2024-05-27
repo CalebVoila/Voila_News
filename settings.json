@@ -1,0 +1,34 @@
+{
+    "APP_NAME": "PacketPrep Blog",
+    "APP_DESCRIPTION": "App to dipslay the blog feeds",
+    "LOADING_GIF": "https://i.imgur.com/hTeRCZh.gif",
+    "HOME_REST_URL": "https://packetprep.com/api/blog",
+    "POPULAR_REST_URL": "https://packetprep.com/api/blog/popular",
+    "FEATURED_REST_URL": "https://packetprep.com/api/blog/featured",
+    "MORE": [
+        {
+            "name": "General",
+            "url": "https://packetprep.com/api/blog/general"
+        },
+        {
+            "name": "Job Openings",
+            "url": "https://packetprep.com/api/blog/job-openings"
+        },
+        {
+            "name": "Quantitative Aptitude",
+            "url": "https://packetprep.com/api/blog/quantitative-aptitude"
+        },
+        {
+            "name": "Verbal Ability",
+            "url": "https://packetprep.com/api/blog/verbal-ability"
+        },
+        {
+            "name": "Reasoning Ability",
+            "url": "https://packetprep.com/api/blog/reasoning-ability"
+        },
+        {
+            "name": "Interview Skills",
+            "url": "https://packetprep.com/api/blog/interview-skills"
+        }
+    ]
+}
