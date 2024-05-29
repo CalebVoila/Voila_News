@@ -1,4 +1,3 @@
-
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -10,24 +9,29 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
-  Map<String, dynamic>? _blogData;
+  List<dynamic> _blogData = [];
 
   @override
   void initState() {
     super.initState();
-    _fetchBlogPosts();
+    fetchData();
   }
 
-  Future<void> _fetchBlogPosts() async {
+  Future<void> fetchData() async {
     final response = await http.get(Uri.parse('https://packetprep.com/api/blog/general'));
     if (response.statusCode == 200) {
       setState(() {
-        _blogData = jsonDecode(response.body);
+        _blogData = jsonDecode(response.body)['data'];
       });
     } else {
-      // Handle error gracefully (e.g., show error message)
-      print('Failed to fetch blog posts. Status code: ${response.statusCode}');
+      throw Exception('Failed to load data');
     }
+  }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
   }
 
   @override
@@ -36,7 +40,32 @@ class _MainScreenState extends State<MainScreen> {
       appBar: AppBar(
         title: Text('Voila News'),
       ),
-      body: _buildBodyContent(),
+      body: _selectedIndex == 0
+          ? ListView.builder(
+        itemCount: _blogData.length,
+        itemBuilder: (context, index) {
+          final blog = _blogData[index];
+          return ListTile(
+            title: Text(blog['title']),
+            subtitle: Text(blog['excerpt']),
+            leading: Image.network(
+              'https://packetprep.com/${blog['image']}',
+              height: 60,
+              width: 60,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Icon(Icons.error);
+              },
+            ),
+          );
+        },
+      )
+          : Center(
+        child: Text(
+          'Screen ${_selectedIndex + 1}',
+          style: TextStyle(fontSize: 24),
+        ),
+      ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         items: const <BottomNavigationBarItem>[
@@ -63,55 +92,5 @@ class _MainScreenState extends State<MainScreen> {
         onTap: _onItemTapped,
       ),
     );
-  }
-
-  Widget _buildBodyContent() {
-    if (_blogData == null) {
-      return Center(
-        child: CircularProgressIndicator(),
-      );
-    }
-
-    return ListView.builder(
-      itemCount: _blogData!['data'].length,
-      itemBuilder: (context, index) {
-        final post = _blogData!['data'][index];
-        return Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (post['image'] != null)
-                Image.network(
-                  post['image'],
-                  width: double.infinity,
-                  height: 200,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) =>
-                      Text('Failed to load image'),
-                ),
-              SizedBox(height: 16.0),
-              Text(
-                post['title'],
-                style: TextStyle(
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(height: 8.0),
-              html(
-                data: post['content'],
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
   }
 }
